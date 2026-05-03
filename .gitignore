@@ -1,0 +1,31 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# OS/editor noise
+.DS_Store
+
+# Virtual environments
+.venv
+
+# local secrets
+.env
+.secrets/
+
+# notebook noise
+.ipynb_checkpoints/
+
+# nbdev / quarto build artifacts
+_docs/
+_proc/
+
+# generated local data
+data/
+tmp/
+
+# accidental scratch files
+/1

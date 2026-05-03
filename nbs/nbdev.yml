@@ -1,0 +1,9 @@
+project:
+  output-dir: _docs
+
+website:
+  title: "slashbtc"
+  site-url: "https://slashpablo.github.io/slashbtc"
+  description: "Python tooling for inspecting the Bitcoin blockchain."
+  repo-branch: main
+  repo-url: "https://github.com/slashpablo/slashbtc"

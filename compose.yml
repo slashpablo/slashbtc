@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:18
+    container_name: slashbtc-postgres
+    environment:
+      POSTGRES_USER: slashbtc
+      POSTGRES_PASSWORD: slashbtc
+      POSTGRES_DB: slashbtc
+    ports:
+      - "5432:5432"
+    volumes:
+      - slashbtc-postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U slashbtc -d slashbtc"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  slashbtc-postgres-data:

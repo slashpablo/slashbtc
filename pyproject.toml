@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "slashbtc"
+dynamic = ["version"]
+description = "Python tooling for inspecting the Bitcoin blockchain."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Pablo Munoz Haro", email = "contact@slashpablo.com" }]
+keywords = ["bitcoin", "blockchain", "rpc", "nbdev"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+]
+dependencies = [
+    "httpx",
+    "python-dotenv",
+    "matplotlib",
+    "numpy",
+    "psycopg[binary]>=3.3.4",
+]
+
+[project.optional-dependencies]
+dev = [
+    "nbdev>=2.3",
+    "jupyter",
+    "ipykernel",
+]
+
+[project.urls]
+Repository = "https://github.com/slashpablo/slashbtc"
+Documentation = "https://slashpablo.github.io/slashbtc/"
+
+[project.entry-points.nbdev]
+slashbtc = "slashbtc._modidx:d"
+
+[tool.setuptools.dynamic]
+version = { attr = "slashbtc.__version__" }
+
+[tool.setuptools.packages.find]
+include = ["slashbtc*"]
+
+[tool.nbdev]
+# Defaults are fine: nbs_path="nbs", lib_path="slashbtc", doc_path="_docs",
+# tst_flags="notest", branch="main". Override here if needed.
+
+[tool.uv]
+cache-keys = [{ file = "pyproject.toml" }, { file = "setup.py" }]
