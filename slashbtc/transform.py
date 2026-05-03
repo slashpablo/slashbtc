@@ -3,23 +3,16 @@
 # %% auto #0
 __all__ = ['SATS_PER_BTC', 'btc_to_sats', 'is_coinbase_tx', 'block_fee_rows']
 
-# %% ../nbs/03_transform.ipynb #99d196e0-c656-411d-86f0-81562279cb39
-from pathlib import Path
-import httpx
-from .core import BitcoinRPC
-from IPython.display import HTML, display
-from pprint import pprint, pformat
-import json
-
 # %% ../nbs/03_transform.ipynb #6bf8f93c-e5fe-4138-8cd9-4dbacd32f4fd
 from decimal import Decimal
 
 # %% ../nbs/03_transform.ipynb #6dc407af-b841-4256-b41b-3f216f191023
-SATS_PER_BTC = Decimal(100_000_000)
+SATS_PER_BTC = Decimal("100000000")
 
 # %% ../nbs/03_transform.ipynb #a73becfc-ec14-4c5d-a20b-0546fb7c1456
 def btc_to_sats(value) -> int:
-    return int(Decimal(str(value)) * SATS_PER_BTC)
+    "Convert a Bitcoin Core BTC value to satoshis."
+    return int((Decimal(str(value)) * SATS_PER_BTC).to_integral_exact())
 
 # %% ../nbs/03_transform.ipynb #13899d4d-9d82-4ce8-97b5-914201e33b5e
 def is_coinbase_tx(tx: dict) -> bool:
@@ -40,10 +33,15 @@ def block_fee_rows(block: dict) -> list[dict]:
             fee_sats = None
             fee_sat_vb = None
         else:
-            input_sats = sum(
-                btc_to_sats(vin["prevout"]["value"])
-                for vin in tx["vin"]
-            )
+            try:
+                input_sats = sum(
+                    btc_to_sats(vin["prevout"]["value"])
+                    for vin in tx["vin"]
+                )
+            except KeyError as exc:
+                raise ValueError(
+                    "block_fee_rows requires getblock verbosity=3 so vin prevouts are present"
+                ) from exc
             output_sats = sum(btc_to_sats(vout["value"]) for vout in tx["vout"])
             fee_sats = input_sats - output_sats
             fee_sat_vb = fee_sats / tx["vsize"]

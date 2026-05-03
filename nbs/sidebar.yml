@@ -5,3 +5,5 @@ website:
       - 00_core.ipynb
       - 01_viz.ipynb
       - 02_schema.ipynb
+      - 03_transform.ipynb
+      - 04_db.ipynb
