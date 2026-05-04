@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Minimal Bitcoin Core JSON-RPC client for blockchain inspection.">
+
+<title>core – slashbtc</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-de52dc3353fe04aa4d07820b7139bd46.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="core – slashbtc">
+<meta property="og:description" content="Minimal Bitcoin Core JSON-RPC client for blockchain inspection.">
+<meta property="og:site_name" content="slashbtc">
+<meta name="twitter:title" content="core – slashbtc">
+<meta name="twitter:description" content="Minimal Bitcoin Core JSON-RPC client for blockchain inspection.">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">slashbtc</span>
+    </a>
+  </div>
+        <div class="quarto-navbar-tools tools-end">
+</div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./core.html">core</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">slashbtc</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./core.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">core</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./viz.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">viz</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./schema.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">schema</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./transform.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Transform</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04_db.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">04_db.html</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#client" id="toc-client" class="nav-link active" data-scroll-target="#client">Client</a></li>
+  <li><a href="#rpc-client" id="toc-rpc-client" class="nav-link" data-scroll-target="#rpc-client">RPC client</a>
+  <ul class="collapse">
+  <li><a href="#bitcoinrpc" id="toc-bitcoinrpc" class="nav-link" data-scroll-target="#bitcoinrpc">BitcoinRPC</a></li>
+  <li><a href="#chain" id="toc-chain" class="nav-link" data-scroll-target="#chain">Chain</a></li>
+  <li><a href="#bitcoinrpc.call" id="toc-bitcoinrpc.call" class="nav-link" data-scroll-target="#bitcoinrpc.call">BitcoinRPC.call</a></li>
+  </ul></li>
+  <li><a href="#exploring-bitcoind-rcp-capabilities" id="toc-exploring-bitcoind-rcp-capabilities" class="nav-link" data-scroll-target="#exploring-bitcoind-rcp-capabilities">Exploring bitcoind RCP capabilities</a></li>
+  <li><a href="#use-cases" id="toc-use-cases" class="nav-link" data-scroll-target="#use-cases">Use Cases</a>
+  <ul class="collapse">
+  <li><a href="#get-most-recent-blocks-hash" id="toc-get-most-recent-blocks-hash" class="nav-link" data-scroll-target="#get-most-recent-blocks-hash">Get most recent block’s hash</a></li>
+  <li><a href="#get-most-recent-block-details" id="toc-get-most-recent-block-details" class="nav-link" data-scroll-target="#get-most-recent-block-details">Get most recent block details</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/slashpablo/slashbtc/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div><div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="core.html.md"><i class="bi bi-file-code"></i>CommonMark</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">core</h1>
+</div>
+
+<div>
+  <div class="description">
+    Minimal Bitcoin Core JSON-RPC client for blockchain inspection.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<p>Bitcoind exposes a JSON-RCP server on port 8332. <code>httpx</code> is used to communicate with it.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If bitcoind is running in a different machine it is useful to forward port 8332 to the machine this python code is running in:</p>
+<pre><code>  ssh -N -L 8332:127.0.0.1:8332 slashbtc@slashbtc-node</code></pre>
+</div>
+</div>
+<hr>
+<section id="client" class="level3">
+<h3 class="anchored" data-anchor-id="client">Client</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> Client(</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    auth:AuthTypes <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, params:QueryParamTypes <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, headers:HeaderTypes <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    cookies:CookieTypes <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, verify:ssl.SSLContext <span class="op">|</span> <span class="bu">str</span> <span class="op">|</span> <span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, cert:CertTypes <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    trust_env:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, http1:<span class="bu">bool</span><span class="op">=</span><span class="va">True</span>, http2:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>, proxy:ProxyTypes <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    mounts:<span class="va">None</span> <span class="op">|</span> typing.Mapping[<span class="bu">str</span>, BaseTransport <span class="op">|</span> <span class="va">None</span>]<span class="op">=</span><span class="va">None</span>, timeout:TimeoutTypes<span class="op">=</span>Timeout(timeout<span class="op">=</span><span class="fl">5.0</span>),</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    follow_redirects:<span class="bu">bool</span><span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    limits:Limits<span class="op">=</span>Limits(max_connections<span class="op">=</span><span class="dv">100</span>, max_keepalive_connections<span class="op">=</span><span class="dv">20</span>, keepalive_expiry<span class="op">=</span><span class="fl">5.0</span>),</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    max_redirects:<span class="bu">int</span><span class="op">=</span><span class="dv">20</span>, event_hooks:<span class="va">None</span> <span class="op">|</span> typing.Mapping[<span class="bu">str</span>, <span class="bu">list</span>[EventHook]]<span class="op">=</span><span class="va">None</span>, base_url:URL <span class="op">|</span> <span class="bu">str</span><span class="op">=</span><span class="st">''</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    transport:BaseTransport <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, default_encoding:<span class="bu">str</span> <span class="op">|</span> typing.Callable[[<span class="bu">bytes</span>], <span class="bu">str</span>]<span class="op">=</span><span class="st">'utf-8'</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span><span class="va">None</span>:</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>An HTTP client, with connection pooling, HTTP/2, redirects, cookie persistence, etc.</em></p>
+<p>It can be shared between threads.</p>
+<p>Usage:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> client <span class="op">=</span> httpx.Client()</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> response <span class="op">=</span> client.get(<span class="st">'https://example.org'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><strong>auth</strong> - <em>(optional)</em> An authentication class to use when sending requests.</li>
+<li><strong>params</strong> - <em>(optional)</em> Query parameters to include in request URLs, as a string, dictionary, or sequence of two-tuples.</li>
+<li><strong>headers</strong> - <em>(optional)</em> Dictionary of HTTP headers to include when sending requests.</li>
+<li><strong>cookies</strong> - <em>(optional)</em> Dictionary of Cookie items to include when sending requests.</li>
+<li><strong>verify</strong> - <em>(optional)</em> Either <code>True</code> to use an SSL context with the default CA bundle, <code>False</code> to disable verification, or an instance of <code>ssl.SSLContext</code> to use a custom context.</li>
+<li><strong>http2</strong> - <em>(optional)</em> A boolean indicating if HTTP/2 support should be enabled. Defaults to <code>False</code>.</li>
+<li><strong>proxy</strong> - <em>(optional)</em> A proxy URL where all the traffic should be routed.</li>
+<li><strong>timeout</strong> - <em>(optional)</em> The timeout configuration to use when sending requests.</li>
+<li><strong>limits</strong> - <em>(optional)</em> The limits configuration to use.</li>
+<li><strong>max_redirects</strong> - <em>(optional)</em> The maximum number of redirect responses that should be followed.</li>
+<li><strong>base_url</strong> - <em>(optional)</em> A URL to use as the base when building request URLs.</li>
+<li><strong>transport</strong> - <em>(optional)</em> A transport class to use for sending requests over the network.</li>
+<li><strong>trust_env</strong> - <em>(optional)</em> Enables or disables usage of environment variables for configuration.</li>
+<li><strong>default_encoding</strong> - <em>(optional)</em> The default encoding to use for decoding response text, if no charset information is included in a response Content-Type header. Set to a callable for automatic character set detection. Default: “utf-8”.</li>
+</ul>
+</section>
+<section id="rpc-client" class="level2">
+<h2 class="anchored" data-anchor-id="rpc-client">RPC client</h2>
+<hr>
+<p><a href="https://github.com/slashpablo/slashbtc/blob/main/slashbtc/core.py#L14" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="bitcoinrpc" class="level3">
+<h3 class="anchored" data-anchor-id="bitcoinrpc">BitcoinRPC</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> BitcoinRPC(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    url:<span class="bu">str</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, <span class="co"># Where to reach bitcoind e.g. 127.0.0.1:8332</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    auth:<span class="bu">tuple</span>[<span class="bu">str</span>, <span class="bu">str</span>] <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, <span class="co"># Auth cookie or username+password</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    timeout:<span class="bu">float</span><span class="op">=</span><span class="fl">30.0</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Tiny synchronous JSON-RPC client for Bitcoin Core.</em></p>
+<hr>
+<p><a href="https://github.com/slashpablo/slashbtc/blob/main/slashbtc/core.py#L54" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="chain" class="level3">
+<h3 class="anchored" data-anchor-id="chain">Chain</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> Chain(</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    rpc:__main__.BitcoinRPC <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, url:<span class="bu">str</span> <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, auth:<span class="bu">tuple</span>[<span class="bu">str</span>, <span class="bu">str</span>] <span class="op">|</span> <span class="va">None</span><span class="op">=</span><span class="va">None</span>, timeout:<span class="bu">float</span><span class="op">=</span><span class="fl">30.0</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Convenience wrapper for common blockchain RPC calls.</em></p>
+<hr>
+<p><a href="https://github.com/slashpablo/slashbtc/blob/main/slashbtc/core.py#L26" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="bitcoinrpc.call" class="level3">
+<h3 class="anchored" data-anchor-id="bitcoinrpc.call">BitcoinRPC.call</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> call(</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    method:<span class="bu">str</span>, params:Any</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>)<span class="op">-&gt;</span>Any:</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><em>Invoke a Bitcoin Core RPC <code>method</code> with positional <code>params</code>.</em></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Refresher on JSON-RPC (and how it differs from REST)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Both use <code>HTTP POST</code> and <code>JSON</code> BUT:</p>
+<p><code>REST</code> models the world as resources with <code>URL</code>s and uses <code>HTTP</code> verbs to “act” on them. Imagine:</p>
+<ul>
+<li><code>GET /blocks/000000...abc</code></li>
+<li><code>GET /transactions/{txid}</code></li>
+<li><code>POST /transactions</code> (body = new tx)</li>
+</ul>
+<p><code>JSON-RPC</code> ignores all that. There’s one endpoint <code>/</code>, always <code>POST</code>, and the body names a function to call:</p>
+<pre><code>{"jsonrpc": "2.0", "id": 1, "method": "getblock", "params": ["000000...abc"]}
+{"jsonrpc": "2.0", "id": 2, "method": "sendrawtransaction", "params": ["0200..."]}</code></pre>
+</div>
+</div>
+<div id="b646b8dd-9987-44e5-90c0-ffe127492b9a" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> <span class="st">"http://127.0.0.1:8332"</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>user, _, password <span class="op">=</span> Path(<span class="st">"../.secrets/bitcoin-rpc.cookie"</span>).read_text().partition(<span class="st">":"</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>auth <span class="op">=</span> httpx.BasicAuth(user, password)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>rpc <span class="op">=</span> BitcoinRPC(url, auth)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="exploring-bitcoind-rcp-capabilities" class="level1">
+<h1>Exploring bitcoind RCP capabilities</h1>
+<p>bitcoind’s json-rpc server includes a <code>help</code> method that is extremely valuable to understand capbabilities</p>
+<div id="ae69ae28-0c98-42d5-9d5d-daffa1969e1d" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(rpc.call(<span class="st">"help"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>== Blockchain ==
+dumptxoutset "path"
+getbestblockhash
+getblock "blockhash" ( verbosity )
+getblockchaininfo
+getblockcount
+getblockfilter "blockhash" ( "filtertype" )
+getblockfrompeer "blockhash" peer_id
+getblockhash height
+getblockheader "blockhash" ( verbose )
+getblockstats hash_or_height ( stats )
+getchainstates
+getchaintips
+getchaintxstats ( nblocks "blockhash" )
+getdeploymentinfo ( "blockhash" )
+getdifficulty
+getmempoolancestors "txid" ( verbose )
+getmempooldescendants "txid" ( verbose )
+getmempoolentry "txid"
+getmempoolinfo
+getrawmempool ( verbose mempool_sequence )
+gettxout "txid" n ( include_mempool )
+gettxoutproof ["txid",...] ( "blockhash" )
+gettxoutsetinfo ( "hash_type" hash_or_height use_index )
+gettxspendingprevout [{"txid":"hex","vout":n},...]
+importmempool "filepath" ( options )
+loadtxoutset "path"
+preciousblock "blockhash"
+pruneblockchain height
+savemempool
+scanblocks "action" ( [scanobjects,...] start_height stop_height "filtertype" options )
+scantxoutset "action" ( [scanobjects,...] )
+verifychain ( checklevel nblocks )
+verifytxoutproof "proof"
+
+== Control ==
+getmemoryinfo ( "mode" )
+getrpcinfo
+help ( "command" )
+logging ( ["include_category",...] ["exclude_category",...] )
+stop
+uptime
+
+== Mining ==
+getblocktemplate {"mode":"str","capabilities":["str",...],"rules":["segwit","str",...],"longpollid":"str","data":"hex"}
+getmininginfo
+getnetworkhashps ( nblocks height )
+getprioritisedtransactions
+prioritisetransaction "txid" ( dummy ) fee_delta
+submitblock "hexdata" ( "dummy" )
+submitheader "hexdata"
+
+== Network ==
+addnode "node" "command" ( v2transport )
+clearbanned
+disconnectnode ( "address" nodeid )
+getaddednodeinfo ( "node" )
+getaddrmaninfo
+getconnectioncount
+getnettotals
+getnetworkinfo
+getnodeaddresses ( count "network" )
+getpeerinfo
+listbanned
+ping
+setban "subnet" "command" ( bantime absolute )
+setnetworkactive state
+
+== Rawtransactions ==
+analyzepsbt "psbt"
+combinepsbt ["psbt",...]
+combinerawtransaction ["hexstring",...]
+converttopsbt "hexstring" ( permitsigdata iswitness )
+createpsbt [{"txid":"hex","vout":n,"sequence":n},...] [{"address":amount,...},{"data":"hex"},...] ( locktime replaceable )
+createrawtransaction [{"txid":"hex","vout":n,"sequence":n},...] [{"address":amount,...},{"data":"hex"},...] ( locktime replaceable )
+decodepsbt "psbt"
+decoderawtransaction "hexstring" ( iswitness )
+decodescript "hexstring"
+descriptorprocesspsbt "psbt" ["",{"desc":"str","range":n or [n,n]},...] ( "sighashtype" bip32derivs finalize )
+finalizepsbt "psbt" ( extract )
+fundrawtransaction "hexstring" ( options iswitness )
+getrawtransaction "txid" ( verbosity "blockhash" )
+joinpsbts ["psbt",...]
+sendrawtransaction "hexstring" ( maxfeerate maxburnamount )
+signrawtransactionwithkey "hexstring" ["privatekey",...] ( [{"txid":"hex","vout":n,"scriptPubKey":"hex","redeemScript":"hex","witnessScript":"hex","amount":amount},...] "sighashtype" )
+submitpackage ["rawtx",...] ( maxfeerate maxburnamount )
+testmempoolaccept ["rawtx",...] ( maxfeerate )
+utxoupdatepsbt "psbt" ( ["",{"desc":"str","range":n or [n,n]},...] )
+
+== Signer ==
+enumeratesigners
+
+== Util ==
+createmultisig nrequired ["key",...] ( "address_type" )
+deriveaddresses "descriptor" ( range )
+estimatesmartfee conf_target ( "estimate_mode" )
+getdescriptorinfo "descriptor"
+getindexinfo ( "index_name" )
+signmessagewithprivkey "privkey" "message"
+validateaddress "address"
+verifymessage "address" "signature" "message"
+
+== Wallet ==
+abandontransaction "txid"
+abortrescan
+addmultisigaddress nrequired ["key",...] ( "label" "address_type" )
+backupwallet "destination"
+bumpfee "txid" ( options )
+createwallet "wallet_name" ( disable_private_keys blank "passphrase" avoid_reuse descriptors load_on_startup external_signer )
+createwalletdescriptor "type" ( {"internal":bool,"hdkey":"str",...} )
+dumpprivkey "address"
+dumpwallet "filename"
+encryptwallet "passphrase"
+getaddressesbylabel "label"
+getaddressinfo "address"
+getbalance ( "dummy" minconf include_watchonly avoid_reuse )
+getbalances
+gethdkeys ( {"active_only":bool,"private":bool,...} )
+getnewaddress ( "label" "address_type" )
+getrawchangeaddress ( "address_type" )
+getreceivedbyaddress "address" ( minconf include_immature_coinbase )
+getreceivedbylabel "label" ( minconf include_immature_coinbase )
+gettransaction "txid" ( include_watchonly verbose )
+getunconfirmedbalance
+getwalletinfo
+importaddress "address" ( "label" rescan p2sh )
+importdescriptors requests
+importmulti requests ( options )
+importprivkey "privkey" ( "label" rescan )
+importprunedfunds "rawtransaction" "txoutproof"
+importpubkey "pubkey" ( "label" rescan )
+importwallet "filename"
+keypoolrefill ( newsize )
+listaddressgroupings
+listdescriptors ( private )
+listlabels ( "purpose" )
+listlockunspent
+listreceivedbyaddress ( minconf include_empty include_watchonly "address_filter" include_immature_coinbase )
+listreceivedbylabel ( minconf include_empty include_watchonly include_immature_coinbase )
+listsinceblock ( "blockhash" target_confirmations include_watchonly include_removed include_change "label" )
+listtransactions ( "label" count skip include_watchonly )
+listunspent ( minconf maxconf ["address",...] include_unsafe query_options )
+listwalletdir
+listwallets
+loadwallet "filename" ( load_on_startup )
+lockunspent unlock ( [{"txid":"hex","vout":n},...] persistent )
+migratewallet ( "wallet_name" "passphrase" )
+newkeypool
+psbtbumpfee "txid" ( options )
+removeprunedfunds "txid"
+rescanblockchain ( start_height stop_height )
+restorewallet "wallet_name" "backup_file" ( load_on_startup )
+send [{"address":amount,...},{"data":"hex"},...] ( conf_target "estimate_mode" fee_rate options )
+sendall ["address",{"address":amount,...},...] ( conf_target "estimate_mode" fee_rate options )
+sendmany ( "" ) {"address":amount,...} ( minconf "comment" ["address",...] replaceable conf_target "estimate_mode" fee_rate verbose )
+sendtoaddress "address" amount ( "comment" "comment_to" subtractfeefromamount replaceable conf_target "estimate_mode" avoid_reuse fee_rate verbose )
+sethdseed ( newkeypool "seed" )
+setlabel "address" "label"
+settxfee amount
+setwalletflag "flag" ( value )
+signmessage "address" "message"
+signrawtransactionwithwallet "hexstring" ( [{"txid":"hex","vout":n,"scriptPubKey":"hex","redeemScript":"hex","witnessScript":"hex","amount":amount},...] "sighashtype" )
+simulaterawtransaction ( ["rawtx",...] {"include_watchonly":bool,...} )
+unloadwallet ( "wallet_name" load_on_startup )
+upgradewallet ( version )
+walletcreatefundedpsbt ( [{"txid":"hex","vout":n,"sequence":n,"weight":n},...] ) [{"address":amount,...},{"data":"hex"},...] ( locktime options bip32derivs )
+walletdisplayaddress "address"
+walletlock
+walletpassphrase "passphrase" timeout
+walletpassphrasechange "oldpassphrase" "newpassphrase"
+walletprocesspsbt "psbt" ( sign "sighashtype" bip32derivs finalize )
+
+== Zmq ==
+getzmqnotifications</code></pre>
+</div>
+</div>
+</section>
+<section id="use-cases" class="level1">
+<h1>Use Cases</h1>
+<section id="get-most-recent-blocks-hash" class="level2">
+<h2 class="anchored" data-anchor-id="get-most-recent-blocks-hash">Get most recent block’s hash</h2>
+<div id="e0711df1-9f7c-46ad-b5fb-4c9fc8012fc2" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(rpc.call(<span class="st">"help"</span>, <span class="st">"getbestblockhash"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>getbestblockhash
+
+Returns the hash of the best (tip) block in the most-work fully-validated chain.
+
+Result:
+"hex"    (string) the block hash, hex-encoded
+
+Examples:
+&gt; bitcoin-cli getbestblockhash 
+&gt; curl --user myusername --data-binary '{"jsonrpc": "2.0", "id": "curltest", "method": "getbestblockhash", "params": []}' -H 'content-type: application/json' http://127.0.0.1:8332/
+</code></pre>
+</div>
+</div>
+<div id="67fa3ca6-ca67-456c-a4e4-6cfa6d3d8ee9" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>rpc <span class="op">=</span> BitcoinRPC(url, auth)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>latest <span class="op">=</span> rpc.call(<span class="st">"getbestblockhash"</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>latest</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<pre><code>'00000000000000000001ce8fdb8b33d1241792b1b11fbbc2e183c03c985f9671'</code></pre>
+</div>
+</div>
+</section>
+<section id="get-most-recent-block-details" class="level2">
+<h2 class="anchored" data-anchor-id="get-most-recent-block-details">Get most recent block details</h2>
+<div id="7176a1db-e67b-4d46-bece-e3bb10d032cb" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(rpc.call(<span class="st">"help"</span>, <span class="st">"getblock"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>getblock "blockhash" ( verbosity )
+
+If verbosity is 0, returns a string that is serialized, hex-encoded data for block 'hash'.
+If verbosity is 1, returns an Object with information about block &lt;hash&gt;.
+If verbosity is 2, returns an Object with information about block &lt;hash&gt; and information about each transaction.
+If verbosity is 3, returns an Object with information about block &lt;hash&gt; and information about each transaction, including prevout information for inputs (only for unpruned blocks in the current best chain).
+
+Arguments:
+1. blockhash    (string, required) The block hash
+2. verbosity    (numeric, optional, default=1) 0 for hex-encoded data, 1 for a JSON object, 2 for JSON object with transaction data, and 3 for JSON object with transaction data including prevout information for inputs
+
+Result (for verbosity = 0):
+"hex"    (string) A string that is serialized, hex-encoded data for block 'hash'
+
+Result (for verbosity = 1):
+{                                 (json object)
+  "hash" : "hex",                 (string) the block hash (same as provided)
+  "confirmations" : n,            (numeric) The number of confirmations, or -1 if the block is not on the main chain
+  "size" : n,                     (numeric) The block size
+  "strippedsize" : n,             (numeric) The block size excluding witness data
+  "weight" : n,                   (numeric) The block weight as defined in BIP 141
+  "height" : n,                   (numeric) The block height or index
+  "version" : n,                  (numeric) The block version
+  "versionHex" : "hex",           (string) The block version formatted in hexadecimal
+  "merkleroot" : "hex",           (string) The merkle root
+  "tx" : [                        (json array) The transaction ids
+    "hex",                        (string) The transaction id
+    ...
+  ],
+  "time" : xxx,                   (numeric) The block time expressed in UNIX epoch time
+  "mediantime" : xxx,             (numeric) The median block time expressed in UNIX epoch time
+  "nonce" : n,                    (numeric) The nonce
+  "bits" : "hex",                 (string) The bits
+  "difficulty" : n,               (numeric) The difficulty
+  "chainwork" : "hex",            (string) Expected number of hashes required to produce the chain up to this block (in hex)
+  "nTx" : n,                      (numeric) The number of transactions in the block
+  "previousblockhash" : "hex",    (string, optional) The hash of the previous block (if available)
+  "nextblockhash" : "hex"         (string, optional) The hash of the next block (if available)
+}
+
+Result (for verbosity = 2):
+{                   (json object)
+  ...,              Same output as verbosity = 1
+  "tx" : [          (json array)
+    {               (json object)
+      ...,          The transactions in the format of the getrawtransaction RPC. Different from verbosity = 1 "tx" result
+      "fee" : n     (numeric) The transaction fee in BTC, omitted if block undo data is not available
+    },
+    ...
+  ]
+}
+
+Result (for verbosity = 3):
+{                                        (json object)
+  ...,                                   Same output as verbosity = 2
+  "tx" : [                               (json array)
+    {                                    (json object)
+      "vin" : [                          (json array)
+        {                                (json object)
+          ...,                           The same output as verbosity = 2
+          "prevout" : {                  (json object) (Only if undo information is available)
+            "generated" : true|false,    (boolean) Coinbase or not
+            "height" : n,                (numeric) The height of the prevout
+            "value" : n,                 (numeric) The value in BTC
+            "scriptPubKey" : {           (json object)
+              "asm" : "str",             (string) Disassembly of the output script
+              "desc" : "str",            (string) Inferred descriptor for the output
+              "hex" : "hex",             (string) The raw output script bytes, hex-encoded
+              "address" : "str",         (string, optional) The Bitcoin address (only if a well-defined address exists)
+              "type" : "str"             (string) The type (one of: nonstandard, anchor, pubkey, pubkeyhash, scripthash, multisig, nulldata, witness_v0_scripthash, witness_v0_keyhash, witness_v1_taproot, witness_unknown)
+            }
+          }
+        },
+        ...
+      ]
+    },
+    ...
+  ]
+}
+
+Examples:
+&gt; bitcoin-cli getblock "00000000c937983704a73af28acdec37b049d214adbda81d7e2a3dd146f6ed09"
+&gt; curl --user myusername --data-binary '{"jsonrpc": "2.0", "id": "curltest", "method": "getblock", "params": ["00000000c937983704a73af28acdec37b049d214adbda81d7e2a3dd146f6ed09"]}' -H 'content-type: application/json' http://127.0.0.1:8332/
+</code></pre>
+</div>
+</div>
+<div id="9d5858fd-0d14-470f-9350-b4dabc489b53" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>rpc <span class="op">=</span> BitcoinRPC(url, auth)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="d39bc143-bf73-4bdd-8f5a-0ccf023cee6f" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>block <span class="op">=</span> rpc.call(<span class="st">"getblock"</span>, latest, <span class="dv">0</span>) <span class="co"># 0 is the verbosity level, there are 0, 1, 2 and 3</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>block[:<span class="dv">25</span>] <span class="op">+</span> <span class="st">'...'</span> <span class="op">+</span> latest[<span class="op">-</span><span class="dv">25</span>:]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<pre><code>'00e0ff3fbbfdaabf09fe4c4b8...1b11fbbc2e183c03c985f9671'</code></pre>
+</div>
+</div>
+<p>This is an encoded version of the block’s data, it is something like:</p>
+<pre><code>[80-byte block header]
+[varint tx_count]
+[transaction 1]
+[transaction 2]
+...</code></pre>
+<p>For human readability use verbosity level 1</p>
+<div id="f2fa2147-e420-491f-8130-41b69c43e154" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>block <span class="op">=</span> rpc.call(<span class="st">"getblock"</span>, latest, <span class="dv">1</span>)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k,v <span class="kw">in</span> block.items():</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> k <span class="op">==</span> <span class="st">'tx'</span>: <span class="cf">continue</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f'</span><span class="sc">{</span>k<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>v<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>txns <span class="op">=</span> block[<span class="st">'tx'</span>][:<span class="dv">3</span>]</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, tx <span class="kw">in</span> <span class="bu">enumerate</span>(txns):</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f'tx[</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">]: </span><span class="sc">{</span>tx<span class="sc">}</span><span class="ss">'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>hash: 00000000000000000001ce8fdb8b33d1241792b1b11fbbc2e183c03c985f9671
+confirmations: 1
+height: 947663
+version: 1073733632
+versionHex: 3fffe000
+merkleroot: 2f28da891f83d8ee44f6a3dc413294096416b3c32a31750e62595150fcb773ac
+time: 1777782179
+mediantime: 1777778091
+nonce: 1110117222
+bits: 17021ff0
+difficulty: 132472011079030.5
+chainwork: 00000000000000000000000000000000000000012481334f8b9d20ac395376b0
+nTx: 2501
+previousblockhash: 0000000000000000000086873be53dce3cbea531631c088f4b4cfe09bfaafdbb
+strippedsize: 851059
+size: 1440297
+weight: 3993474
+tx[0]: 80859e034c3be0abba051dd755ba01fcad223b8abc7700c0e3452afc2b8ace74
+tx[1]: e900d15b3398cad6f1ba0fd32684ea9dd2c5c8e8462039f8db8ff0a3ee958ed2
+tx[2]: 0d55ba165815946a595e770d00e26534a219307c641f7fa31de9b8d4db042dfd</code></pre>
+</div>
+</div>
+<p>In the above we have transaction hashes, to get the details of a transaction a new call is needed</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/slashpablo\.github\.io\/slashbtc");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/slashpablo/slashbtc/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>
