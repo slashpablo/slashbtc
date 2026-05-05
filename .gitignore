@@ -26,6 +26,10 @@ _proc/
 # generated local data
 data/
 tmp/
+!slashbtc/data/
+!slashbtc/data/sample_blocks/
+!slashbtc/data/sample_blocks/*.json
+!slashbtc/data/sample_blocks/*.json.gz
 
 # accidental scratch files
 /1
