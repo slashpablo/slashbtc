@@ -36,7 +36,7 @@ Repository = "https://github.com/slashpablo/slashbtc"
 Documentation = "https://slashpablo.github.io/slashbtc/"
 
 [project.scripts]
-slashbtc-capture-fee-block = "slashbtc.cli:capture_fee_block_main"
+slashbtc-capture-sample-block = "slashbtc.samples:capture_sample_block_main"
 
 [project.entry-points.nbdev]
 slashbtc = "slashbtc._modidx:d"
@@ -48,7 +48,7 @@ version = { attr = "slashbtc.__version__" }
 include = ["slashbtc*"]
 
 [tool.setuptools.package-data]
-slashbtc = ["data/fee_blocks/*.json", "data/fee_blocks/*.json.gz"]
+slashbtc = ["data/sample_blocks/*.json", "data/sample_blocks/*.json.gz"]
 
 [tool.nbdev]
 # Defaults are fine: nbs_path="nbs", lib_path="slashbtc", doc_path="_docs",

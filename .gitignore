@@ -27,9 +27,9 @@ _proc/
 data/
 tmp/
 !slashbtc/data/
-!slashbtc/data/fee_blocks/
-!slashbtc/data/fee_blocks/*.json
-!slashbtc/data/fee_blocks/*.json.gz
+!slashbtc/data/sample_blocks/
+!slashbtc/data/sample_blocks/*.json
+!slashbtc/data/sample_blocks/*.json.gz
 
 # accidental scratch files
 /1
